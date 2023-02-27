@@ -1,11 +1,16 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
+using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using SCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using static Lumina.Data.Parsing.Uld.UldRoot;
 
 namespace HeelsPlugin
 {
@@ -214,16 +219,42 @@ namespace HeelsPlugin
           if (positionPtr == IntPtr.Zero)
             return;
 
+          int animID = GetAnimation();
+          if (animID != 0 &&    // Exit if its just 0
+            animID == 584 ||    // Doze Start 1
+            animID == 585 ||    // Doze Loop 1
+            animID == 653 ||    // Ground Sit Start 1
+            animID == 654 ||    // Ground Sit Loop 1
+            animID == 3770 ||   // Ground Sit Start 4
+            animID == 3771 ||   // Ground Sit Loop 4
+            animID == 642 ||    // Sit Start 1
+            animID == 643 ||    // Sit Loop 1
+            animID >= 3131 && animID <= 3142 ||  // Contains Start and Loop of Doze 2 + 3; Ground Sit 2 + 3; Sit 2 + 3
+            animID >= 8001 && animID <= 8004     // Contains Start and Loop of Sit 4 + 5
+            ) {
+            PluginLog.Debug("Found Animation to not trigger: " + animID);
+            if (!replace) {
+              offset = 0;
+              // TODO: Somehow trigger SetPosition without endless recursion
+            }
+          }
+
           // Offset the Y coordinate.
           if (replace)
             position.Y = offset;
           else
             position.Y += offset;
+          PluginLog.Debug("Offsetting by: " + offset);
 
           Marshal.StructureToPtr(position, positionPtr, false);
         }
       }
       catch { }
+    }
+
+    public unsafe int GetAnimation() {
+      var chara = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)PlayerSelf.Address;
+      return chara->ActionTimelineManager.Driver.TimelineIds[0];
     }
   }
 }
