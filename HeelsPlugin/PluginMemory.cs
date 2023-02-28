@@ -220,18 +220,8 @@ namespace HeelsPlugin
             return;
 
           int animID = GetAnimation();
-          if (animID != 0 &&    // Exit if its just 0
-            animID == 584 ||    // Doze Start 1
-            animID == 585 ||    // Doze Loop 1
-            animID == 653 ||    // Ground Sit Start 1
-            animID == 654 ||    // Ground Sit Loop 1
-            animID == 3770 ||   // Ground Sit Start 4
-            animID == 3771 ||   // Ground Sit Loop 4
-            animID == 642 ||    // Sit Start 1
-            animID == 643 ||    // Sit Loop 1
-            animID >= 3131 && animID <= 3142 ||  // Contains Start and Loop of Doze 2 + 3; Ground Sit 2 + 3; Sit 2 + 3
-            animID >= 8001 && animID <= 8004     // Contains Start and Loop of Sit 4 + 5
-            ) {
+
+          if (animID != 0 && validAnimIds.Contains(animID)) { 
             PluginLog.Debug("Found Animation to not trigger: " + animID);
             if (!replace) {
               offset = 0;
@@ -256,5 +246,22 @@ namespace HeelsPlugin
       var chara = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)PlayerSelf.Address;
       return chara->ActionTimelineManager.Driver.TimelineIds[0];
     }
+
+
+       //     animID == 584 || Doze Start 1
+       //     animID == 585 || Doze Loop 1
+       //     animID == 653 || Ground Sit Start 1
+       //     animID == 654 || Ground Sit Loop 1
+       //     animID == 3770 || Ground Sit Start 4
+       //     animID == 3771 || Ground Sit Loop 4
+       //     animID == 642 || Sit Start 1
+       //     animID == 643 || Sit Loop 1
+       //     animID >= 3131 && animID <= 3142 || Contains Start and Loop of Doze 2 + 3; Ground Sit 2 + 3; Sit 2 + 3
+       //     animID >= 8001 && animID <= 8004    Contains Start and Loop of Sit 4 + 5
+    HashSet<int> validAnimIds = new HashSet<int> {
+      584, 585, 653, 654, 3770, 3771, 642,
+      643, 3131, 3132, 3133, 3134, 3135, 3136, 3137, 3138, 3139, 3140, 3141, 3142,
+      8001, 8002, 8003, 8004
+    };
   }
 }
