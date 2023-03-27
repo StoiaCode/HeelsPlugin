@@ -36,7 +36,7 @@ namespace HeelsPlugin
       playerMovementHook = Hook<PlayerMovementDelegate>.FromAddress(playerMovementFunc, new PlayerMovementDelegate(PlayerMovementHook));
 
       timer = new Timer(1000);
-      timer.Elapsed += (source, e) => correctOffsetOnAnimation(PlayerSelf.Address);
+      timer.Elapsed += (source, e) => correctOffsetOnAnimation();
       timer.AutoReset = true;
 
       playerMovementHook.Enable();
@@ -51,6 +51,8 @@ namespace HeelsPlugin
           playerMovementHook?.Disable();
           playerMovementHook?.Dispose();
         }
+        timer.Stop();
+        timer.Dispose();
       }
       catch
       {
@@ -243,13 +245,25 @@ namespace HeelsPlugin
       }
     }
 
-    public void correctOffsetOnAnimation(IntPtr actor) {
-      int animID = GetAnimation(actor);
+    // Reset position of your char if you are Sitting/Dozing etc.
+    public void correctOffsetOnAnimation() {
+      int animID = GetAnimation(PlayerSelf.Address);
 
       if (validAnimIds.Contains(animID)) {
         PluginLog.Debug("Found Animation to not trigger: " + animID);
         timer.Enabled = false;
         SetPosition(PlayerSelf.Position.Y, PlayerSelf.Address, true);
+      }
+    }
+
+    // Set offset when sitting to a _different_ position in case people want to use this for scaled characters etc.
+    public void correctOffsetOnAnimation(float offset) {
+      int animID = GetAnimation(PlayerSelf.Address);
+
+      if (validAnimIds.Contains(animID)) {
+        PluginLog.Debug("Found Animation to trigger custom offset: " + animID);
+        timer.Enabled = false;
+        SetPosition(PlayerSelf.Position.Y + offset, PlayerSelf.Address, true);
       }
     }
 
