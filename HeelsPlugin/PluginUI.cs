@@ -123,12 +123,15 @@ namespace HeelsPlugin
         }
 
         ImGui.Checkbox("Correct Sitting (BETA)", ref Plugin.Configuration.disableSit);
-                //Not implemented
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Enabling this will keep you from Floating during certain Animations. Currently in Beta, will not Sync with Mare.");
         ImGui.Checkbox("Enable Custom Sitting Offset (BETA)", ref Plugin.Configuration.customSitEnable);
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Enabling this will offset your height during certain Animations a custom Amount. Useful if you use Custom Racial Scaling etc. Currently in Beta, will not Sync with Mare.");
 
         if (Plugin.Configuration.customSitEnable) {
           ImGui.SameLine();
 		  ImGui.InputFloat(Plugin.Configuration.customSit.ToString(), ref Plugin.Configuration.customSit, 0.01f, 0.05f, "%.3f");
+          if (ImGui.IsItemHovered()) ImGui.SetTooltip("Currently in Beta, will not Sync with Mare.");
+
         }
 
 		ImGui.Spacing();
