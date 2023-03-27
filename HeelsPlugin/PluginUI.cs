@@ -123,8 +123,15 @@ namespace HeelsPlugin
         }
 
         ImGui.Checkbox("Correct Sitting (BETA)", ref Plugin.Configuration.disableSit);
+                //Not implemented
+        ImGui.Checkbox("Enable Custom Sitting Offset (BETA)", ref Plugin.Configuration.customSitEnable);
 
-        ImGui.Spacing();
+        if (Plugin.Configuration.customSitEnable) {
+          ImGui.SameLine();
+		  ImGui.InputFloat(Plugin.Configuration.customSit.ToString(), ref Plugin.Configuration.customSit, 0.01f, 0.05f, "%.3f");
+        }
+
+		ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
 

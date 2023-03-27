@@ -11,6 +11,8 @@ namespace HeelsPlugin
 
     public List<ConfigModel> Configs = new();
     public bool disableSit = false;
+    public bool customSitEnable = false;
+    public float customSit = 0;
 
     public void Save()
     {

@@ -248,7 +248,7 @@ namespace HeelsPlugin
         PluginLog.Debug("Found Animation to not trigger: " + animID);
         timer.Enabled = false;
         SetPosition(PlayerSelf.Position.Y, PlayerSelf.Address, true);
-      }
+	  }
     }
 
     // Set offset when sitting to a _different_ position in case people want to use this for scaled characters etc.
