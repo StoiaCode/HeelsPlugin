@@ -8,8 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using SCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using System.Timers;
+using static Lumina.Data.Parsing.Layer.LayerCommon;
 using static Lumina.Data.Parsing.Uld.UldRoot;
 
 namespace HeelsPlugin
@@ -22,6 +25,7 @@ namespace HeelsPlugin
     public readonly Hook<PlayerMovementDelegate> playerMovementHook;
     public Dictionary<GameObject, float> PlayerOffsets = new();
 
+    private Timer timer;
     private float? lastOffset = null;
 
     private GameObject PlayerSelf => Plugin.ObjectTable.First();
@@ -30,6 +34,10 @@ namespace HeelsPlugin
     {
       playerMovementFunc = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 48 8B 03 48 8B CB FF 50 ?? 83 F8 ?? 75 ??");
       playerMovementHook = Hook<PlayerMovementDelegate>.FromAddress(playerMovementFunc, new PlayerMovementDelegate(PlayerMovementHook));
+
+      timer = new Timer(1000);
+      timer.Elapsed += (source, e) => correctOffsetOnAnimation(PlayerSelf.Address);
+      timer.AutoReset = true;
 
       playerMovementHook.Enable();
     }
@@ -190,6 +198,7 @@ namespace HeelsPlugin
     {
       // Call the original function.
       playerMovementHook.Original(player);
+      timer.Enabled = true;
       PlayerMove(player);
     }
 
@@ -219,34 +228,35 @@ namespace HeelsPlugin
           if (positionPtr == IntPtr.Zero)
             return;
 
-          int animID = GetAnimation();
-
-          if (animID != 0 && validAnimIds.Contains(animID)) { 
-            PluginLog.Debug("Found Animation to not trigger: " + animID);
-            if (!replace) {
-              offset = 0;
-              // TODO: Somehow trigger SetPosition without endless recursion
-            }
-          }
-
           // Offset the Y coordinate.
           if (replace)
             position.Y = offset;
           else
             position.Y += offset;
-          PluginLog.Debug("Offsetting by: " + offset);
+          PluginLog.Verbose("Offsetting " + actor + " by: " + offset);
 
           Marshal.StructureToPtr(position, positionPtr, false);
         }
       }
-      catch { }
+      catch(Exception e) {
+        PluginLog.Error("Encountered an error during setting the Position: ", e);
+      }
     }
 
-    public unsafe int GetAnimation() {
-      var chara = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)PlayerSelf.Address;
+    public void correctOffsetOnAnimation(IntPtr actor) {
+      int animID = GetAnimation(actor);
+
+      if (validAnimIds.Contains(animID)) {
+        PluginLog.Debug("Found Animation to not trigger: " + animID);
+        timer.Enabled = false;
+        SetPosition(PlayerSelf.Position.Y, PlayerSelf.Address, true);
+      }
+    }
+
+    public unsafe int GetAnimation(IntPtr player) {
+      var chara = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)player;
       return chara->ActionTimelineManager.Driver.TimelineIds[0];
     }
-
 
        //     animID == 584 || Doze Start 1
        //     animID == 585 || Doze Loop 1
