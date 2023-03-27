@@ -2,18 +2,12 @@
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
 using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using SCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using System.Timers;
-using static Lumina.Data.Parsing.Layer.LayerCommon;
-using static Lumina.Data.Parsing.Uld.UldRoot;
 
 namespace HeelsPlugin
 {
