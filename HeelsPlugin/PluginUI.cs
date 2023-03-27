@@ -118,8 +118,11 @@ namespace HeelsPlugin
 
       if (ImGui.Begin("HeelsPlugin Config", ref visible))
       {
-        if (ImGui.Button("Add Entry", new Vector2(-1, 24 * fontScale)))
+        if (ImGui.Button("Add Entry", new Vector2(-1, 24 * fontScale))) {
           AddConfigLine();
+        }
+
+        ImGui.Checkbox("Correct Sitting (BETA)", ref Plugin.Configuration.disableSit);
 
         ImGui.Spacing();
         ImGui.Separator();

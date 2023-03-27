@@ -10,6 +10,7 @@ namespace HeelsPlugin
     public int Version { get; set; } = 1;
 
     public List<ConfigModel> Configs = new();
+    public bool disableSit = false;
 
     public void Save()
     {

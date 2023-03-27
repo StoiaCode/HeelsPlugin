@@ -29,9 +29,10 @@ namespace HeelsPlugin
       playerMovementFunc = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 48 8B 03 48 8B CB FF 50 ?? 83 F8 ?? 75 ??");
       playerMovementHook = Hook<PlayerMovementDelegate>.FromAddress(playerMovementFunc, new PlayerMovementDelegate(PlayerMovementHook));
 
-      timer = new Timer(1000);
-      timer.Elapsed += (source, e) => correctOffsetOnAnimation();
-      timer.AutoReset = true;
+	  timer = new Timer(1000);
+	  timer.Elapsed += (source, e) => correctOffsetOnAnimation();
+	  timer.AutoReset = true;
+
 
       playerMovementHook.Enable();
     }
@@ -243,7 +244,7 @@ namespace HeelsPlugin
     public void correctOffsetOnAnimation() {
       int animID = GetAnimation(PlayerSelf.Address);
 
-      if (validAnimIds.Contains(animID)) {
+      if (validAnimIds.Contains(animID) && Plugin.Configuration.disableSit) {
         PluginLog.Debug("Found Animation to not trigger: " + animID);
         timer.Enabled = false;
         SetPosition(PlayerSelf.Position.Y, PlayerSelf.Address, true);
