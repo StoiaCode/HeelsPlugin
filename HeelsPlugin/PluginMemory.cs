@@ -244,15 +244,21 @@ namespace HeelsPlugin
     public void correctOffsetOnAnimation(float offset) {
       int animID = GetAnimation(PlayerSelf.Address);
 
-      if (validAnimIds.Contains(animID) && Plugin.Configuration.disableSit) {
-        if (Plugin.Configuration.customSitEnable) {
+      if (animIds.Contains(animID) && Plugin.Configuration.disableSit) {
+        var supposedOffset = PlayerSelf.Position.Y;
+
+        if (sittingAnimIds.Contains(animID)) {
+            supposedOffset -= 0.500f;
+		}
+
+		if (Plugin.Configuration.customSitEnable) {
 			PluginLog.Debug("Found Animation to use Custom Offset: " + animID);
 			timer.Enabled = false;
-			SetPosition(PlayerSelf.Position.Y + offset, PlayerSelf.Address, true);
+			SetPosition(supposedOffset + offset, PlayerSelf.Address, true);
         } else {
 			PluginLog.Debug("Found Animation to not trigger: " + animID);
 			timer.Enabled = false;
-			SetPosition(PlayerSelf.Position.Y, PlayerSelf.Address, true);
+			SetPosition(supposedOffset, PlayerSelf.Address, true);
         }
 	  }
     }
@@ -272,10 +278,13 @@ namespace HeelsPlugin
        //     animID == 643 || Sit Loop 1
        //     animID >= 3131 && animID <= 3142 || Contains Start and Loop of Doze 2 + 3; Ground Sit 2 + 3; Sit 2 + 3
        //     animID >= 8001 && animID <= 8004    Contains Start and Loop of Sit 4 + 5
-    HashSet<int> validAnimIds = new HashSet<int> {
-      584, 585, 653, 654, 3770, 3771, 642,
-      643, 3131, 3132, 3133, 3134, 3135, 3136, 3137, 3138, 3139, 3140, 3141, 3142,
-      8001, 8002, 8003, 8004
+    HashSet<int> animIds = new HashSet<int> {
+      584, 585, 653, 654, 3770, 3771, 3135, 3136, 3137, 3138, 3139, 3140, 3141, 3142, 642, 643, 3131, 3132, 3133, 3134, 8001, 8002, 8003, 8004
+	};
+
+    // Need extra -500 
+    HashSet<int> sittingAnimIds = new HashSet<int> {
+      642, 643, 3131, 3132, 3133, 3134, 8001, 8002, 8003, 8004
     };
   }
 }
